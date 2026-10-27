@@ -4,7 +4,7 @@
  const STEPS=SF_GUIDE_STEPS,$=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
  const state=()=>SP.store.get(),plan=()=>state().plans.find(x=>x.demandId==="DEM-1001"&&x.status!=="CANCELLED");
  const root=$("#sf-tour"),card=$("#sf-tour-card"),spot=$("#sf-tour-spotlight"),shade=$("#sf-tour-shade"),drawer=$("#sf-tour-drawer");
- let current=0,active=true,drawerOpen=false,moving=false,focus=null;
+ let current=0,active=true,drawerOpen=false,moving=false,focus=null,drag=null,manualPosition=false;
  const safe=s=>String(s||"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");
  const click=s=>{const x=$(s);if(!x)return false;x.click();return true;};
  const dialog=()=>$("#modal.open .dialog");
@@ -68,32 +68,99 @@
  const contents=()=>{
    $("#sf-tour-drawer-list").innerHTML=STEPS.map((s,i)=>`<button data-go="${i}" class="${i===current?"is-current":""}"><b>${String(i+1).padStart(2,"0")}</b><span><strong>${safe(s.title)}</strong><small>${safe(s.chapter)}</small></span></button>`).join("");
  };
+
+ const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
+ const targetRect=element=>{
+   let rect=element.getBoundingClientRect();
+   // Very wide elements are represented by the actual key information inside them.
+   // This prevents a large table or full-width banner from hiding its own content.
+   if(rect.width>innerWidth*.70){
+     let inner=null;
+     if(element.matches(".attention-box"))inner=element.querySelector("strong");
+     else if(element.matches(".page-intro"))inner=element.querySelector("h1");
+     else if(element.matches(".metric-grid"))inner=element.querySelector(".metric-card");
+     else if(element.matches(".table-wrap"))inner=element.querySelector("tbody tr:first-child td:first-child");
+     else if(element.matches(".workflow-ribbon"))inner=element.querySelector("div:first-child");
+     else if(element.matches(".five-constraints"))inner=element.querySelector(".constraint-item:first-child");
+     else if(element.matches(".procurement-summary"))inner=element.querySelector(".proc-highlight");
+     if(inner){
+       const candidate=inner.getBoundingClientRect();
+       if(candidate.width>0&&candidate.height>0)rect=candidate;
+     }
+   }
+   return rect;
+ };
  const move=()=>{
-   if(!active||drawerOpen)return;
-   const el=target(STEPS[current]);focus=el;
-   if(!el||!el.isConnected){
-     root.classList.add("sf-tour-center");root.classList.remove("sf-tour-focused");
+   if(!active||drawerOpen||drag)return;
+   const element=target(STEPS[current]);focus=element;
+   if(!element||!element.isConnected){
+     root.classList.add("sf-tour-center");
+     root.classList.remove("sf-tour-focused");
      spot.style.opacity="0";shade.style.opacity="1";
-     ["top","left","right","bottom","width"].forEach(x=>card.style.removeProperty(x));
+     if(!manualPosition)["top","left","right","bottom","width"].forEach(p=>card.style.removeProperty(p));
      return;
    }
-   root.classList.remove("sf-tour-center");root.classList.add("sf-tour-focused");shade.style.opacity="0";
-   const rect=el.getBoundingClientRect(),vw=innerWidth,vh=innerHeight;
-   const margin=14,pad=7,gap=17,w=Math.min(425,vw-28);
-   const x=Math.max(4,rect.left-pad),y=Math.max(4,rect.top-pad);
-   spot.style.left=`${x}px`;spot.style.top=`${y}px`;
-   spot.style.width=`${Math.max(18,Math.min(vw-x-4,rect.width+pad*2))}px`;
-   spot.style.height=`${Math.max(18,Math.min(vh-y-4,rect.height+pad*2))}px`;spot.style.opacity="1";
-   card.style.width=`${w}px`;
-   const h=card.offsetHeight;
-   let left,top;
-   if(rect.left>w+gap+margin){left=rect.left-w-gap;top=rect.top+Math.min(20,(rect.height-h)/2);}
-   else if(vw-rect.right>w+gap+margin){left=rect.right+gap;top=rect.top+Math.min(20,(rect.height-h)/2);}
-   else if(vh-rect.bottom>=h+gap+margin){left=rect.left+rect.width/2-w/2;top=rect.bottom+gap;}
-   else if(rect.top>=h+gap+margin){left=rect.left+rect.width/2-w/2;top=rect.top-h-gap;}
-   else{left=vw-w-margin;top=vh-h-margin;}
-   card.style.left=`${Math.max(margin,Math.min(vw-w-margin,left))}px`;
-   card.style.top=`${Math.max(margin,Math.min(vh-h-margin,top))}px`;
+   root.classList.remove("sf-tour-center");
+   root.classList.add("sf-tour-focused");
+   shade.style.opacity="0";
+   const rect=targetRect(element),vw=innerWidth,vh=innerHeight,pad=7,margin=12,gap=14;
+   const spotlight={
+     left:clamp(rect.left-pad,2,vw-2),
+     top:clamp(rect.top-pad,2,vh-2),
+     right:clamp(rect.right+pad,2,vw-2),
+     bottom:clamp(rect.bottom+pad,2,vh-2)
+   };
+   spot.style.left=spotlight.left+"px";
+   spot.style.top=spotlight.top+"px";
+   spot.style.width=Math.max(5,spotlight.right-spotlight.left)+"px";
+   spot.style.height=Math.max(5,spotlight.bottom-spotlight.top)+"px";
+   spot.style.opacity="1";
+   if(manualPosition){
+     card.style.left=clamp(parseFloat(card.style.left)||margin,margin,Math.max(margin,vw-card.offsetWidth-margin))+"px";
+     card.style.top=clamp(parseFloat(card.style.top)||margin,margin,Math.max(margin,vh-card.offsetHeight-margin))+"px";
+     return;
+   }
+   const normalWidth=Math.min(392,vw-2*margin);
+   const freeRight=vw-rect.right-gap-margin,freeLeft=rect.left-gap-margin;
+   const variants=[];
+   const add=(width,left,top,kind)=>{
+     const w=clamp(width,Math.min(225,vw-2*margin),normalWidth);
+     card.style.width=w+"px";
+     const height=card.offsetHeight;
+     const l=clamp(left,margin,Math.max(margin,vw-w-margin));
+     const t=clamp(top,margin,Math.max(margin,vh-height-margin));
+     const overlapW=Math.max(0,Math.min(l+w,spotlight.right)-Math.max(l,spotlight.left));
+     const overlapH=Math.max(0,Math.min(t+height,spotlight.bottom)-Math.max(t,spotlight.top));
+     const overlap=overlapW*overlapH;
+     const gapX=Math.max(0,spotlight.left-(l+w),l-spotlight.right);
+     const gapY=Math.max(0,spotlight.top-(t+height),t-spotlight.bottom);
+     const distance=Math.hypot(gapX,gapY);
+     const cost=overlap*70+distance*3+Math.max(0,normalWidth-w)*.9+(kind==="corner"?65:0);
+     variants.push({cost,left:l,top:t,width:w});
+   };
+   const typicalHeight=Math.min(card.scrollHeight,innerHeight-2*margin,412);
+   if(freeRight>=225){
+     const width=Math.min(normalWidth,freeRight);
+     add(width,rect.right+gap,rect.top,"right");
+     add(width,rect.right+gap,rect.bottom-typicalHeight,"right");
+   }
+   if(freeLeft>=225){
+     const width=Math.min(normalWidth,freeLeft);
+     add(width,rect.left-gap-width,rect.top,"left");
+     add(width,rect.left-gap-width,rect.bottom-typicalHeight,"left");
+   }
+   const centerX=rect.left+rect.width/2-normalWidth/2;
+   add(normalWidth,centerX,rect.top-gap-typicalHeight,"above");
+   add(normalWidth,centerX,rect.bottom+gap,"below");
+   add(normalWidth,margin,margin,"corner");
+   add(normalWidth,vw-normalWidth-margin,margin,"corner");
+   add(normalWidth,margin,vh-typicalHeight-margin,"corner");
+   add(normalWidth,vw-normalWidth-margin,vh-typicalHeight-margin,"corner");
+   variants.sort((a,b)=>a.cost-b.cost);
+   const best=variants[0];
+   card.style.width=best.width+"px";
+   card.style.left=Math.round(best.left)+"px";
+   card.style.top=Math.round(clamp(best.top,margin,Math.max(margin,vh-card.offsetHeight-margin)))+"px";
  };
  const locate=()=>{
    const el=target(STEPS[current]);
@@ -107,7 +174,7 @@
  };
  function show(i){
    if(i<0||i>=STEPS.length)return;
-   active=true;current=i;root.hidden=false;$("#sf-tour-launcher").hidden=true;
+   active=true;current=i;manualPosition=false;root.hidden=false;$("#sf-tour-launcher").hidden=true;
    const s=STEPS[i];
    setup(s);
    $("#sf-tour-chapter").textContent=s.chapter;
@@ -118,12 +185,6 @@
    $("#sf-tour-progress-fill").style.width=`${(i+1)*100/STEPS.length}%`;
    $("#sf-tour-back").disabled=i===0;
    $("#sf-tour-next").innerHTML=`${safe(s.setup==="keepPlan"&&plan()?"استعراض المسودة":s.next||(i===STEPS.length-1?"إنهاء الجولة":"التالي"))} <span aria-hidden="true">←</span>`;
-   if(!$(".sf-tour-more")){
-     const d=document.createElement("details");d.className="sf-tour-more";
-     d.innerHTML="<summary>نص المقدم · شرح أوسع</summary><p id='sf-tour-narration'></p>";
-     $("#sf-tour-insight").insertAdjacentElement("afterend",d);
-   }
-   $(".sf-tour-more").open=false;$("#sf-tour-narration").textContent=s.note||s.body;
    $("#sf-tour-hint").textContent=i===STEPS.length-1?"تقدر ترجع لأي مرحلة أو تكمل باستخدام النظام بحرية.":"الخطوة التالية بتنقلك مباشرة إلى الجزء المطلوب داخل النظام.";
    contents();locate();
  }
@@ -146,6 +207,35 @@
    else{move();$("#sf-tour-overview").focus();}
  };
  function init(){
+
+   const grip=$(".sf-tour-top");
+   grip.addEventListener("pointerdown",event=>{
+     if(event.button!==0||event.target.closest("button,a,input,select,textarea"))return;
+     const rect=card.getBoundingClientRect();
+     manualPosition=true;
+     drag={id:event.pointerId,x:event.clientX,y:event.clientY,left:rect.left,top:rect.top};
+     root.classList.remove("sf-tour-center");
+     root.classList.add("sf-tour-focused","sf-tour-dragging");
+     card.style.width=rect.width+"px";
+     card.style.left=rect.left+"px";
+     card.style.top=rect.top+"px";
+     try{grip.setPointerCapture(event.pointerId);}catch{}
+     event.preventDefault();
+   });
+   grip.addEventListener("pointermove",event=>{
+     if(!drag||event.pointerId!==drag.id)return;
+     card.style.left=clamp(drag.left+event.clientX-drag.x,10,Math.max(10,innerWidth-card.offsetWidth-10))+"px";
+     card.style.top=clamp(drag.top+event.clientY-drag.y,10,Math.max(10,innerHeight-card.offsetHeight-10))+"px";
+     event.preventDefault();
+   });
+   const releaseGrip=event=>{
+     if(!drag||event.pointerId!==drag.id)return;
+     drag=null;root.classList.remove("sf-tour-dragging");
+     try{grip.releasePointerCapture(event.pointerId);}catch{}
+     move();
+   };
+   grip.addEventListener("pointerup",releaseGrip);
+   grip.addEventListener("pointercancel",releaseGrip);
    $("#sf-tour-next").addEventListener("click",next);
    $("#sf-tour-back").addEventListener("click",()=>show(current-1));
    $("#sf-tour-close").addEventListener("click",end);
