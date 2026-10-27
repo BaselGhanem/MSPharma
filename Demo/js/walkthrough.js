@@ -94,10 +94,17 @@
    if(!active||drawerOpen||drag)return;
    const element=target(STEPS[current]);focus=element;
    if(!element||!element.isConnected){
-     root.classList.add("sf-tour-center");
-     root.classList.remove("sf-tour-focused");
+     if(manualPosition){
+       root.classList.remove("sf-tour-center");
+       root.classList.add("sf-tour-focused");
+       card.style.left=clamp(parseFloat(card.style.left)||12,12,Math.max(12,innerWidth-card.offsetWidth-12))+"px";
+       card.style.top=clamp(parseFloat(card.style.top)||12,12,Math.max(12,innerHeight-card.offsetHeight-12))+"px";
+     }else{
+       root.classList.add("sf-tour-center");
+       root.classList.remove("sf-tour-focused");
+       ["top","left","right","bottom","width"].forEach(p=>card.style.removeProperty(p));
+     }
      spot.style.opacity="0";shade.style.opacity="1";
-     if(!manualPosition)["top","left","right","bottom","width"].forEach(p=>card.style.removeProperty(p));
      return;
    }
    root.classList.remove("sf-tour-center");
