@@ -172,8 +172,12 @@
  const locate=()=>{
    const el=target(STEPS[current]);
    if(el?.isConnected){
-     const r=el.getBoundingClientRect();
-     if(r.top<95||r.bottom>innerHeight-88){
+     const r=targetRect(el),small=innerWidth<760;
+     const desiredHeight=Math.min(card.offsetHeight||360,innerHeight-24)+20;
+     const squeezed=small && r.height<innerHeight*.48 && r.top<desiredHeight && innerHeight-r.bottom<desiredHeight;
+     if(squeezed){
+       el.scrollIntoView({behavior:"smooth",block:"start",inline:"nearest"});
+     }else if(r.top<95||r.bottom>innerHeight-88){
        el.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"instant":"smooth",block:"center",inline:"nearest"});
      }
    }
