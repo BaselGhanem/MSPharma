@@ -73,3 +73,73 @@ body{font-family:"Almarai",Arial,sans-serif}
 }
 @media(max-height:650px){.sf-tour-card{padding:14px 17px;max-height:calc(100dvh - 12px)}.sf-tour-top{margin-bottom:8px}.sf-tour-meta{margin-bottom:8px}.sf-tour-progress{margin:0 0 10px}.sf-tour-controls{gap:6px}#sf-tour-title{margin-bottom:5px}#sf-tour-description{line-height:1.8;margin-bottom:9px}.sf-tour-insight{line-height:1.8;margin-bottom:8px}}
 @media(prefers-reduced-motion:reduce){.sf-tour *{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+
+/* The explanation is always visible. Scrolling stays inside the text region;
+   the navigation controls remain reachable on short projector screens. */
+.sf-tour-card{
+  width:min(392px,calc(100vw - 24px));
+  max-height:min(412px,calc(100dvh - 24px));
+  overflow:hidden;
+  padding:18px 19px 15px;
+  transition:left .27s cubic-bezier(.22,.72,.2,1),top .27s cubic-bezier(.22,.72,.2,1),width .24s ease;
+}
+.sf-tour-scroll{
+  min-height:0;
+  flex:1 1 auto;
+  overflow-y:auto;
+  overflow-x:hidden;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(108,213,200,.5) transparent;
+  padding-inline-end:5px;
+  overscroll-behavior:contain;
+}
+.sf-tour-scroll::-webkit-scrollbar{width:4px}
+.sf-tour-scroll::-webkit-scrollbar-thumb{background:rgba(108,213,200,.45);border-radius:10px}
+.sf-tour-top{
+  margin-bottom:12px;
+  flex:0 0 auto;
+  cursor:grab;
+  touch-action:none;
+  user-select:none;
+  -webkit-user-select:none;
+  padding:2px 0 5px;
+}
+.sf-tour-top:active,.sf-tour-dragging .sf-tour-top{cursor:grabbing}
+.sf-tour-brand-wrap{display:flex;align-items:center;gap:7px;min-width:0}
+.sf-tour-grip{display:inline-flex;justify-content:center;align-items:center;width:20px;height:23px;border-radius:7px;background:rgba(125,221,205,.09);color:#8fd9d0;font:800 18px sans-serif}
+.sf-tour-drag-label{font-size:9px;color:#90bbb9;white-space:nowrap;letter-spacing:0}
+.sf-tour-meta{margin-bottom:10px}
+#sf-tour-title{margin-bottom:8px;font-size:clamp(18px,2vw,22px);line-height:1.55}
+#sf-tour-description{font-size:11.6px;line-height:2;color:#cce3e0;margin-bottom:10px}
+.sf-tour-insight{font-size:10.5px;line-height:1.85;padding:9px 12px;margin-bottom:0}
+.sf-tour-progress{margin:9px 0 13px;flex:0 0 auto}
+.sf-tour-controls{flex:0 0 auto}
+.sf-tour-button{min-height:41px}
+.sf-tour-hint{display:none}
+.sf-tour-center .sf-tour-card{
+  max-height:min(510px,calc(100dvh - 24px));
+  overflow:hidden;
+  padding:clamp(22px,3vw,33px);
+}
+.sf-tour-center .sf-tour-card #sf-tour-description{font-size:13px;line-height:2}
+.sf-tour-center .sf-tour-card .sf-tour-hint{display:block;margin:9px 0 0}
+.sf-tour-dragging .sf-tour-card{transition:none!important}
+.sf-tour-dragging .sf-tour-top{cursor:grabbing}
+@media(max-height:690px){
+  .sf-tour-card{max-height:min(360px,calc(100dvh - 16px));padding:13px 15px 12px}
+  .sf-tour-center .sf-tour-card{max-height:calc(100dvh - 22px)}
+  .sf-tour-top{margin-bottom:7px}
+  .sf-tour-meta{margin-bottom:7px}
+  #sf-tour-title{font-size:17px;line-height:1.55;margin-bottom:5px}
+  #sf-tour-description{line-height:1.85;font-size:11px;margin-bottom:8px}
+  .sf-tour-insight{padding:8px 10px;font-size:10px}
+  .sf-tour-progress{margin:8px 0 10px}
+  .sf-tour-button{min-height:38px}
+}
+@media(max-width:480px){
+  .sf-tour-card{max-height:min(400px,calc(100dvh - 18px))}
+  .sf-tour-drag-label{display:none}
+  .sf-tour-top{margin-bottom:9px}
+  .sf-tour-center .sf-tour-card{width:calc(100vw - 24px)!important}
+}
