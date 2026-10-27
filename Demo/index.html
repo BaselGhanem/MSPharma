@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#071b21">
+  <meta name="description" content="SupplyFlow — رحلة متكاملة في تخطيط التوريد الدوائي، من الطلب إلى خطة الإنتاج الرئيسية.">
+  <title>SupplyFlow | رحلة التخطيط الذكي</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <div class="noise" aria-hidden="true"></div>
+  <div class="glow glow-a" aria-hidden="true"></div>
+  <div class="glow glow-b" aria-hidden="true"></div>
+  <a class="skip" href="#slide">تجاوز القائمة إلى الشرح</a>
+  <div class="app">
+    <header class="topbar">
+      <a class="brand" href="#start" aria-label="SupplyFlow — بداية العرض">
+        <span class="brand-symbol"><span>S</span><span>F</span></span>
+        <span class="brand-copy"><strong>SupplyFlow</strong><small>PHARMA SUPPLY INTELLIGENCE</small></span>
+      </a>
+      <div class="topbar-center"><span class="live-dot"></span><span>رحلة من الطلب إلى قرار الإنتاج</span><span class="topbar-line"></span><span id="chapterLabel">المقدمة</span></div>
+      <div class="top-actions">
+        <button class="icon-btn tooltip" id="overviewBtn" type="button" aria-label="فهرس العرض" title="فهرس العرض"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg></button>
+        <button class="icon-btn tooltip" id="fullscreenBtn" type="button" aria-label="ملء الشاشة" title="ملء الشاشة"><svg viewBox="0 0 24 24"><path d="M8 3H4a1 1 0 0 0-1 1v4m13-5h4a1 1 0 0 1 1 1v4M3 16v4a1 1 0 0 0 1 1h4m13-5v4a1 1 0 0 1-1 1h-4"/></svg></button>
+        <a class="app-link" href="../index.html" title="فتح نظام SupplyFlow"><span>افتح النظام</span><svg viewBox="0 0 24 24"><path d="M14 4h6v6m0-6-9 9m-1-7H5a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-5"/></svg></a>
+      </div>
+    </header>
+    <div class="chapter-meter"><span id="progressLine"></span></div>
+    <div class="workspace">
+      <aside class="chapter-rail" aria-label="فصول الرحلة">
+        <div class="rail-label">مسار الرحلة <span>THE JOURNEY</span></div>
+        <nav id="chapterNav" aria-label="التنقل بين الفصول"></nav>
+        <div class="rail-bottom"><span class="rail-orbit"></span><div><strong>ONE CONNECTED FLOW</strong><small>DEMAND → EXECUTION</small></div></div>
+      </aside>
+      <main class="main-stage" id="slide" tabindex="-1">
+        <div id="slideMount" class="slide-mount" aria-live="polite" aria-atomic="true"></div>
+      </main>
+    </div>
+    <footer class="control-dock">
+      <div class="dock-start">
+        <div class="slide-index"><strong id="currentNumber">01</strong><span>/</span><span id="totalNumber">23</span></div>
+        <div class="dock-caption"><strong id="currentTitle">رحلة التخطيط</strong><small id="currentChapter">المقدمة</small></div>
+      </div>
+      <div class="dock-center">
+        <button class="nav-btn nav-prev" id="prevBtn" type="button" aria-label="الشريحة السابقة"><svg viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></svg><span>السابق</span></button>
+        <button class="nav-btn nav-next" id="nextBtn" type="button"><span>ابدأ الرحلة</span><svg viewBox="0 0 24 24"><path d="m15 5-7 7 7 7"/></svg></button>
+      </div>
+      <div class="dock-end">
+        <button class="soft-toggle" id="notesBtn" type="button" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M4 4h16v13H8l-4 3V4Zm4 5h8M8 13h6"/></svg><span>نص المقدم</span></button>
+        <button class="soft-toggle" id="autoBtn" type="button" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="m8 5 11 7-11 7V5Z"/></svg><span>تشغيل تلقائي</span></button>
+      </div>
+    </footer>
+  </div>
+  <div class="overlay" id="overviewOverlay" hidden>
+    <div class="overlay-backdrop" data-close="overview"></div>
+    <div class="overview-panel" role="dialog" aria-modal="true" aria-labelledby="overviewHeading">
+      <div class="overview-head"><div><span>QUICK NAVIGATION</span><h2 id="overviewHeading">محتويات العرض</h2><p>انتقل لأي محطة من رحلة التخطيط مباشرة.</p></div><button class="icon-btn" id="closeOverviewBtn" aria-label="إغلاق الفهرس">×</button></div>
+      <div id="overviewGrid" class="overview-grid"></div>
+      <div class="overview-bottom">استخدم الأسهم من لوحة المفاتيح للتنقل · اضغط Esc للإغلاق · F لملء الشاشة</div>
+    </div>
+  </div>
+  <div class="notes-sheet" id="notesSheet" hidden role="region" aria-label="نص المقدم">
+    <div class="notes-header"><strong>نص العرض المقترح</strong><button id="closeNotesBtn" type="button" aria-label="إخفاء نص المقدم">×</button></div>
+    <p id="notesContent"></p>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
