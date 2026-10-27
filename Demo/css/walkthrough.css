@@ -143,3 +143,6 @@ body{font-family:"Almarai",Arial,sans-serif}
   .sf-tour-top{margin-bottom:9px}
   .sf-tour-center .sf-tour-card{width:calc(100vw - 24px)!important}
 }
+
+/* Keep surrounding application context readable while emphasizing the selected control. */
+.sf-tour-spotlight{box-shadow:0 0 0 250vmax rgba(2,16,21,.46),0 0 0 5px rgba(87,212,195,.12),0 0 35px rgba(77,222,200,.28)}
