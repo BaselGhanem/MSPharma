@@ -1,1 +1,50 @@
-
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#099999">
+  <meta name="description" content="Supply Planning Workspace — Pharmaceutical Manufacturing Planning">
+  <title>SupplyFlow | تخطيط التوريد</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="js/seed.js" defer></script>
+  <script src="js/engine.js" defer></script>
+  <script src="js/store.js" defer></script>
+  <script src="js/app.js" defer></script>
+</head>
+<body>
+  <div id="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand"><div class="brand-mark">S<span>F</span></div><div><strong>SupplyFlow</strong><small>PHARMA PLANNING</small></div></div>
+      <div class="workspace-tag"><span class="status-dot"></span><div><strong>Planning Workspace</strong><small>LOCAL DEMO · FIREBASE-READY</small></div></div>
+      <div class="nav-heading">WORKSPACE</div>
+      <nav id="main-nav" aria-label="التنقل الرئيسي">
+        <button class="nav-link active" data-page="dashboard"><span class="nav-glyph">◫</span><span>لوحة التحكم</span></button>
+        <button class="nav-link" data-page="demands"><span class="nav-glyph">▤</span><span>الطلب وصافي الاحتياج</span></button>
+        <button class="nav-link" data-page="conversions"><span class="nav-glyph">▧</span><span>التحويل والتشغيلات</span></button>
+        <button class="nav-link" data-page="constraints"><span class="nav-glyph">◈</span><span>محددات التخطيط</span></button>
+        <button class="nav-link" data-page="mps"><span class="nav-glyph">▦</span><span>خطة الإنتاج MPS</span></button>
+        <button class="nav-link" data-page="procurement"><span class="nav-glyph">◬</span><span>نواقص المواد MRP</span><span id="shortage-pill" class="nav-number" hidden>0</span></button>
+        <div class="nav-heading nested">SETUP</div>
+        <button class="nav-link" data-page="master"><span class="nav-glyph">⚙</span><span>المنتجات والمواد والخطوط</span></button>
+        <button class="nav-link" data-page="audit"><span class="nav-glyph">◷</span><span>سجل النشاط</span></button>
+      </nav>
+      <div class="sidebar-bottom"><div class="profile-icon">SP</div><div class="profile-copy"><strong>Supply Planning</strong><span>Prototype Environment</span></div><span class="tiny-signal">●</span></div>
+    </aside>
+    <div class="mobile-backdrop" id="mobile-backdrop"></div>
+    <div class="main-shell">
+      <header class="topbar">
+        <div class="topbar-start"><button id="menu-toggle" class="icon-button menu-toggle" aria-label="فتح القائمة">☰</button><div class="crumb">OPERATIONS <span>/</span> <strong id="breadcrumb">Dashboard</strong></div></div>
+        <div class="topbar-end"><span class="environment"><span class="status-dot"></span> Local mode</span><span class="header-divider"></span><span id="today-label" class="today-label"></span><button class="avatar" aria-label="User">SP</button></div>
+      </header>
+      <main id="page" tabindex="-1"></main>
+      <footer class="page-footer"><span>SUPPLYFLOW · FRONTEND PROTOTYPE</span><span>Planning estimates only — not a GMP / ERP release system</span></footer>
+    </div>
+  </div>
+  <div id="modal" class="modal-layer" aria-live="polite"></div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

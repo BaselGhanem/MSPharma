@@ -1,0 +1,3 @@
+product_sku,market,forecast_packs,firm_orders_packs,fg_stock_packs,incoming_packs,safety_packs,agent_stock_packs,historical_packs,due_date,priority,notes
+TAB-500-A,Jordan,14000,11000,1800,1000,800,6500,12000,2026-11-10,HIGH,Example only
+CAP-20-B,Saudi Arabia,11000,12000,1000,0,1000,2800,9800,2026-11-20,NORMAL,Example only
